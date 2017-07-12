@@ -19,6 +19,9 @@ const errors = {
 
   'destination-not-defined': new Error('`options.destination MUST be defined`'),
   'destination-not-string': new Error('`options.destination` MUST be a string'),
+
+  'fontFamily-not-defined': new Error('`options.fontFamily MUST be defined`'),
+  'fontFamily-not-string': new Error('`options.fontFamily` MUST be a string'),
 };
 
 export default errors;

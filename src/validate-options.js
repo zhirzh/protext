@@ -56,6 +56,20 @@ function validateOptions(options) {
     case options.destination.constructor !== String:
       return errors['destination-not-string'];
 
+    // options.fontFamily
+    case 'fontFamily' in options:
+      switch (true) {
+        case options.fontFamily === undefined:
+        case options.fontFamily === null:
+          return errors['fontFamily-not-defined'];
+
+        case options.fontFamily.constructor !== String:
+          return errors['fontFamily-not-string'];
+
+        default:
+          return null;
+      }
+
     default:
       return null;
   }

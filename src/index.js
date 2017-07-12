@@ -49,7 +49,7 @@ class Protext {
         }
 
         .protext {
-          font-family: "protext";
+          font-family: "protext", "${this.fontFamily}";
         }
       </style>`,
     );
@@ -85,11 +85,13 @@ class Protext {
   unpackOptions(options) {
     this.destination = options.destination;
 
-    this.sourceFontPath = options.font;
+    this.sourceFont = opentype.loadSync(options.font);
 
     const charsets = options.charsets || utils.getDefaultCharsets();
     this.sourceCharset = charsets.source;
     this.targetCharset = charsets.target;
+
+    this.fontFamily = options.fontFamily || this.sourceFont.names.fontFamily.en;
   }
 
   generateMapper() {
@@ -106,14 +108,12 @@ class Protext {
   }
 
   generateTargetFont() {
-    const sourceFont = opentype.loadSync(this.sourceFontPath);
-
-    const glyphs = [sourceFont.glyphs.get(0)];
+    const glyphs = [this.sourceFont.glyphs.get(0)];
 
     Array.from(this.mapper.entries()).forEach(([sourceChar, targetChar]) => {
-      const sourceGlyph = sourceFont.charToGlyph(sourceChar);
+      const sourceGlyph = this.sourceFont.charToGlyph(sourceChar);
       const targetGlyph = new opentype.Glyph(
-        sourceFont.charToGlyph(targetChar),
+        this.sourceFont.charToGlyph(targetChar),
       );
 
       targetGlyph.path = sourceGlyph.path;
@@ -121,11 +121,12 @@ class Protext {
     });
 
     const targetFont = new opentype.Font({
-      familyName: utils.randomString(),
-      styleName: utils.randomString(),
-      unitsPerEm: sourceFont.unitsPerEm,
-      ascender: sourceFont.ascender,
-      descender: sourceFont.descender,
+      familyName: this.sourceFont.names.fontFamily.en,
+      styleName: this.sourceFont.names.fontSubfamily.en,
+
+      unitsPerEm: this.sourceFont.unitsPerEm,
+      ascender: this.sourceFont.ascender,
+      descender: this.sourceFont.descender,
 
       glyphs,
     });
