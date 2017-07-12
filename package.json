@@ -1,0 +1,32 @@
+{
+  "name": "protext",
+  "version": "1.0.0",
+  "author": "Shirsh Zibbu <zibbu.shirsh+github@gmail.com>",
+  "engines": {
+    "node": "8.x",
+    "npm": "5.x"
+  },
+  "scripts": {},
+  "dependencies": {
+    "opentype.js": "^0.7.2"
+  },
+  "devDependencies": {
+    "babel-core": "^6.25.0",
+    "babel-loader": "^7.1.1",
+    "babel-polyfill": "^6.23.0",
+    "babel-preset-env": "^1.6.0",
+    "eslint": "^3.19.0",
+    "eslint-config-airbnb-base": "^11.2.0",
+    "eslint-plugin-import": "^2.7.0",
+    "webpack": "^3.2.0"
+  },
+  "eslintConfig": {
+    "extends": "airbnb-base",
+    "rules": {
+      "arrow-parens": [
+        "error",
+        "as-needed"
+      ]
+    }
+  }
+}
