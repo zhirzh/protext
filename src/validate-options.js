@@ -2,19 +2,15 @@ import errors from './errors';
 
 function validateOptions(options) {
   switch (true) {
-    // options
+    // options: required
+    case options === undefined:
+    case options === null:
+      return errors['options-not-defined'];
+
     case options.constructor !== Object:
       return errors['options-not-object'];
 
-    // options.font
-    case options.font === undefined:
-    case options.font === null:
-      return errors['font-not-defined'];
-
-    case options.font.constructor !== String:
-      return errors['font-not-string'];
-
-    // options.charsets
+    // options.charsets: optional
     case 'charsets' in options:
       switch (true) {
         case options.charsets === undefined:
@@ -24,7 +20,7 @@ function validateOptions(options) {
         case options.charsets.constructor !== Object:
           return errors['charsets-not-object'];
 
-        // options.charsets.source
+        // options.charsets.source: required
         case options.charsets.source === undefined:
         case options.charsets.source === null:
           return errors['source-not-defined'];
@@ -32,7 +28,7 @@ function validateOptions(options) {
         case options.charsets.source.constructor !== Array:
           return errors['source-not-array'];
 
-        // options.charsets.target
+        // options.charsets.target: required
         case options.charsets.target === undefined:
         case options.charsets.target === null:
           return errors['target-not-defined'];
@@ -40,7 +36,7 @@ function validateOptions(options) {
         case options.charsets.target.constructor !== Array:
           return errors['target-not-array'];
 
-        // options.charsets.{source,target}
+        // options.charsets.{source,target}: required
         case options.charsets.target.length < options.charsets.source.length:
           return errors['target-smaller-than-source'];
 
@@ -48,7 +44,7 @@ function validateOptions(options) {
           return null;
       }
 
-    // options.destination
+    // options.destination: required
     case options.destination === undefined:
     case options.destination === null:
       return errors['destination-not-defined'];
@@ -56,7 +52,15 @@ function validateOptions(options) {
     case options.destination.constructor !== String:
       return errors['destination-not-string'];
 
-    // options.fontFamily
+    // options.font: required
+    case options.font === undefined:
+    case options.font === null:
+      return errors['font-not-defined'];
+
+    case options.font.constructor !== String:
+      return errors['font-not-string'];
+
+    // options.fontFamily: optional
     case 'fontFamily' in options:
       switch (true) {
         case options.fontFamily === undefined:

@@ -28,13 +28,18 @@ class Protext {
     };
   }
 
-  encodeText(sourceText) {
-    const targetText = sourceText
-      .split('')
-      .map(sourceChar => this.mapper.get(sourceChar) || sourceChar)
-      .join('');
+  encodeBody(html) {
+    const sourceTextRegexp = new RegExp(
+      '{{#protext}}([\\s\\S]*?){{/protext}}',
+      'g',
+    );
 
-    return targetText;
+    const encodedHtml = html.replace(
+      sourceTextRegexp,
+      (_, p1) => `<span class="protext">${this.encodeText(p1)}</span>`,
+    );
+
+    return encodedHtml;
   }
 
   encodeHead(html) {
@@ -57,20 +62,6 @@ class Protext {
     return encodedHtml;
   }
 
-  encodeBody(html) {
-    const sourceTextRegexp = new RegExp(
-      '{{#protext}}([\\s\\S]*?){{/protext}}',
-      'g',
-    );
-
-    const encodedHtml = html.replace(
-      sourceTextRegexp,
-      (_, p1) => `<span class="protext">${this.encodeText(p1)}</span>`,
-    );
-
-    return encodedHtml;
-  }
-
   encodeHtml(filepath) {
     const filename = path.basename(filepath).replace(/(.tmpl)?$/, '');
 
@@ -82,16 +73,13 @@ class Protext {
     fs.writeFileSync(path.resolve(this.destination, filename), html);
   }
 
-  unpackOptions(options) {
-    this.destination = options.destination;
+  encodeText(sourceText) {
+    const targetText = sourceText
+      .split('')
+      .map(sourceChar => this.mapper.get(sourceChar) || sourceChar)
+      .join('');
 
-    this.sourceFont = opentype.loadSync(options.font);
-
-    const charsets = options.charsets || utils.getDefaultCharsets();
-    this.sourceCharset = charsets.source;
-    this.targetCharset = charsets.target;
-
-    this.fontFamily = options.fontFamily || this.sourceFont.names.fontFamily.en;
+    return targetText;
   }
 
   generateMapper() {
@@ -133,6 +121,18 @@ class Protext {
     });
 
     return targetFont;
+  }
+
+  unpackOptions(options) {
+    this.destination = options.destination;
+
+    this.sourceFont = opentype.loadSync(options.font);
+
+    const charsets = options.charsets || utils.getDefaultCharsets();
+    this.sourceCharset = charsets.source;
+    this.targetCharset = charsets.target;
+
+    this.fontFamily = options.fontFamily || this.sourceFont.names.fontFamily.en;
   }
 
   writeTargetFont() {
