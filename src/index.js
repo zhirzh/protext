@@ -117,6 +117,7 @@ class Protext {
       );
 
       targetGlyph.path = sourceGlyph.path;
+      targetGlyph.advanceWidth = sourceGlyph.advanceWidth;
       glyphs.push(targetGlyph);
     });
 
