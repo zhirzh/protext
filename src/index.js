@@ -17,7 +17,7 @@ class Protext {
   fontFamily: string;
   mapper: Mapper;
   targetFontFileCount: number;
-  targetFontFilename: string;
+  targetFontFilenames: Array<string>;
 
   sourceFont: Font;
   targetFonts: Array<Font>;
@@ -36,8 +36,8 @@ class Protext {
     utils.cleanDestination(this.destination);
 
     this.mapper = this.generateMapper();
-    this.targetFonts = this.generateTargetFont();
-    this.targetFontFilename = this.writeTargetFont();
+    this.targetFonts = this.generateTargetFonts();
+    this.targetFontFilenames = this.writeTargetFont();
 
     return {
       encodeText: this.encodeText.bind(this),
@@ -65,7 +65,7 @@ class Protext {
 
     const encodedHtml = html.replace(
       protextStyleRegexp,
-      utils.getStyleTag(this.targetFontFilename, this.fontFamily, this.targetFontFileCount),
+      utils.getStyleTag(this.targetFontFilenames, this.fontFamily),
     );
 
     return encodedHtml;
@@ -98,7 +98,7 @@ class Protext {
     inStream
       .pipe(replaceStream(
         protextStyleRegexp,
-        utils.getStyleTag(this.targetFontFilename, this.fontFamily, this.targetFontFileCount),
+        utils.getStyleTag(this.targetFontFilenames, this.fontFamily),
       ))
       .pipe(replaceStream(
         sourceTextRegexp,
@@ -129,7 +129,7 @@ class Protext {
     return mapper;
   }
 
-  generateTargetFont(): Array<Font> {
+  generateTargetFonts(): Array<Font> {
     const notdefGlyph = new opentype.Glyph({
         name: '.notdef',
         unicode: 0,
@@ -156,16 +156,22 @@ class Protext {
       glyphset.push(targetGlyph);
     });
 
-    const targetFonts = glyphsets.map(glyphs => new opentype.Font({
-      familyName: this.sourceFont.familyName,
-      styleName: this.sourceFont.styleName,
+    const targetFonts = glyphsets.map(glyphs => {
+      const targetFont = new opentype.Font({
+        familyName: this.sourceFont.familyName,
+        styleName: this.sourceFont.styleName,
 
-      unitsPerEm: this.sourceFont.unitsPerEm,
-      ascender: this.sourceFont.ascender,
-      descender: this.sourceFont.descender,
+        unitsPerEm: this.sourceFont.unitsPerEm,
+        ascender: this.sourceFont.ascender,
+        descender: this.sourceFont.descender,
 
-      glyphs,
-    }));
+        glyphs,
+      });
+
+      targetFont.filename = utils.randomString();
+
+      return targetFont;
+    });
 
     return targetFonts;
   }
@@ -187,15 +193,16 @@ class Protext {
     this.targetFontFileCount = options.count || 1;
   }
 
-  writeTargetFont(): string {
-    const targetFontFilename = utils.randomString();
+  writeTargetFont(): Array<string> {
     const protextDirpath = path.resolve(this.destination, 'protext');
 
-    this.targetFonts.forEach((targetFont, idx) => {
-      targetFont.download(path.resolve(protextDirpath, `${targetFontFilename}_${idx}.ttf`));
+    this.targetFonts.forEach((targetFont) => {
+      const targetFontFilepath = path.resolve(protextDirpath, `${targetFont.filename}.ttf`);
+      targetFont.download(targetFontFilepath);
     });
 
-    return targetFontFilename;
+    const targetFontFilenames = this.targetFonts.map(targetFont => targetFont.filename)
+    return targetFontFilenames;
   }
 }
 
