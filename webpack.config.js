@@ -1,6 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 
+const FlowBabelWebpackPlugin = require('flow-babel-webpack-plugin');
+
 const SRC_DIR = path.resolve(__dirname, 'src');
 const BUILD_DIR = path.resolve(__dirname, 'build');
 
@@ -26,8 +28,11 @@ module.exports = {
         test: /\.js$/,
         loader: 'babel-loader',
         include: SRC_DIR,
-        query: { presets: ['env'] },
       },
     ],
   },
+
+  plugins: [
+    new FlowBabelWebpackPlugin(),
+  ],
 };
