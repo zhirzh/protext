@@ -7,6 +7,7 @@ type Options = {
     source: Charset,
     target: Charset,
   },
+  count: number,
   destination: string,
   font: string,
   fontFamily: string,

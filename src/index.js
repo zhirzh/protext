@@ -16,14 +16,14 @@ class Protext {
   destination: string;
   fontFamily: string;
   mapper: Mapper;
-
+  targetFontFileCount: number;
   targetFontFilename: string;
 
   sourceFont: Font;
   targetFont: Font;
 
   sourceCharset: Charset;
-  targetCharset:Charset;
+  targetCharset: Charset;
 
   constructor(options: Options) {
     const err = validateOptions(options);
@@ -160,13 +160,15 @@ class Protext {
   unpackOptions(options: Options) {
     this.destination = options.destination;
 
-    this.sourceFont = opentype.loadSync(options.font);
-
     const charsets = options.charsets || utils.getDefaultCharsets();
     this.sourceCharset = charsets.source;
     this.targetCharset = charsets.target;
 
     this.fontFamily = options.fontFamily || this.sourceFont.names.fontFamily.en;
+
+    this.sourceFont = opentype.loadSync(options.font);
+
+    this.targetFontFileCount = options.count || 1;
   }
 
   writeTargetFont(): string {
