@@ -4,7 +4,7 @@ const Protext = require('../build/protext').default;
 
 const encoder = new Protext({
     destination: 'build',
-    font: path.resolve(__dirname, 'Lobster-Regular.ttf'),
+    font: path.resolve(__dirname, 'font.ttf'),
     count: 3,
 });
 
