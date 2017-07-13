@@ -6,7 +6,6 @@
     "node": "8.x",
     "npm": "5.x"
   },
-  "scripts": {},
   "dependencies": {
     "opentype.js": "^0.7.2"
   },
@@ -28,5 +27,9 @@
         "as-needed"
       ]
     }
+  },
+  "scripts": {
+    "start": "webpack -w",
+    "build": "webpack -p"
   }
 }

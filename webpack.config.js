@@ -18,7 +18,7 @@ module.exports = {
   target: 'node',
   externals: nodeModules,
 
-  output: { path: BUILD_DIR, filename: 'index.js', libraryTarget: 'commonjs2' },
+  output: { path: BUILD_DIR, filename: 'protext.js', libraryTarget: 'commonjs2' },
 
   module: {
     rules: [
