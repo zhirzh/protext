@@ -34,38 +34,30 @@ function getDefaultCharsets(): { source: Charset, target: Charset } {
   };
 }
 
-function generateFontfaces(name: string, count: number): string {
-  const fontfaces = [];
-
-  for (let i = 0; i < count; i += 1) {
-    fontfaces.push(`
+function generateFontfaces(names: Array<string>): string {
+  const fontfaces = names.map(name => (`
       @font-face {
-        src: url("protext/${name}_${i}.ttf");
-        font-family: "protext_${i}";
-      }
-    `);
-  }
+      src: url("protext/${name}.ttf");
+      font-family: "protext_${name}";
+    }
+  `))
 
   return fontfaces.join('');
 }
 
-function generateFontfamilies(count: number): string {
-  const fontfamilies = [];
-
-  for (let i = 0; i < count; i += 1) {
-    fontfamilies.push(`"protext_${i}"`);
-  }
+function generateFontfamilies(names: Array<string>): string {
+  const fontfamilies = names.map(name => (`"protext_${name}"`));
 
   return fontfamilies.join(', ');
 }
 
-function getStyleTag(targetFontFilename: string, fontFamily: string, targetFontFileCount: number): string {
+function getStyleTag(targetFontFilenames: Array<string>, fontFamily: string): string {
   return (`
     <style>
-      ${generateFontfaces(targetFontFilename, targetFontFileCount)}
+      ${generateFontfaces(targetFontFilenames)}
 
       .protext {
-        font-family: ${generateFontfamilies(targetFontFileCount)}, "${fontFamily}";
+        font-family: ${generateFontfamilies(targetFontFilenames)}, "${fontFamily}";
       }
     </style>
   `);
