@@ -34,6 +34,21 @@ function getDefaultCharsets(): { source: Charset, target: Charset } {
   };
 }
 
+function getStyleTag(targetFontFilename: string, fontFamily: string): string {
+  return (`
+    <style>
+      @font-face {
+        font-family: "protext";
+        src: url("protext/${targetFontFilename}");
+      }
+
+      .protext {
+        font-family: "protext", "${fontFamily}";
+      }
+    </style>
+  `);
+}
+
 function randomString(): string {
   return crypto.randomBytes(16).toString('hex');
 }
@@ -41,5 +56,6 @@ function randomString(): string {
 export default {
   cleanDestination,
   getDefaultCharsets,
+  getStyleTag,
   randomString,
 };

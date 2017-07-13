@@ -10,6 +10,7 @@ import type { Charset, Font, Mapper, Options } from './types';
 
 // import opentype from 'opentype.js';
 const opentype = require('opentype.js');
+const replaceStream = require('replacestream');
 
 class Protext {
   destination: string;
@@ -40,7 +41,8 @@ class Protext {
 
     return {
       encodeText: this.encodeText.bind(this),
-      encodeHtml: this.encodeHtml.bind(this),
+      encodeHtmlFile: this.encodeHtmlFile.bind(this),
+      encodeHtmlStream: this.encodeHtmlStream.bind(this),
     };
   }
 
@@ -63,22 +65,13 @@ class Protext {
 
     const encodedHtml = html.replace(
       protextStyleRegexp,
-      `<style>
-        @font-face {
-          font-family: "protext";
-          src: url("protext/${this.targetFontFilename}");
-        }
-
-        .protext {
-          font-family: "protext", "${this.fontFamily}";
-        }
-      </style>`,
+      utils.getStyleTag(this.targetFontFilename, this.fontFamily),
     );
 
     return encodedHtml;
   }
 
-  encodeHtml(filepath: string) {
+  encodeHtmlFile(filepath: string) {
     const filename = path.basename(filepath).replace(/(.tmpl)?$/, '');
 
     let html = fs.readFileSync(filepath, 'utf8');
@@ -87,6 +80,31 @@ class Protext {
     html = this.encodeBody(html);
 
     fs.writeFileSync(path.resolve(this.destination, filename), html);
+  }
+
+  encodeHtmlStream(filepath: string) {
+    const filename = path.basename(filepath).replace(/(.tmpl)?$/, '');
+
+    const protextStyleRegexp = new RegExp('{{protext}}', 'g');
+    const sourceTextRegexp = new RegExp(
+      '{{#protext}}([\\s\\S]*?){{/protext}}',
+      'g',
+    );
+
+
+    const inStream = fs.createReadStream(filepath);
+    const outStream = fs.createWriteStream(path.resolve(this.destination, filename));
+
+    inStream
+      .pipe(replaceStream(
+        protextStyleRegexp,
+        utils.getStyleTag(this.targetFontFilename, this.fontFamily),
+      ))
+      .pipe(replaceStream(
+        sourceTextRegexp,
+        (_, p1) => `<span class="protext">${this.encodeText(p1)}</span>`,
+      ))
+      .pipe(outStream);
   }
 
   encodeText(sourceText: string): string {
