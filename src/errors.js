@@ -7,6 +7,10 @@ const errors = {
   'charsets-not-defined': new Error('`options.charsets MUST be defined`'),
   'charsets-not-object': new Error('`options.charsets` MUST be an object'),
 
+  // options.count
+  'count-not-defined': new Error('`options.count MUST be defined`'),
+  'count-not-object': new Error('`options.count` MUST be a number'),
+
   // options.charsets.source
   'source-not-array': new Error('`options.charsets.source` MUST be an array'),
   'source-not-defined': new Error('`options.charsets.source MUST be defined`'),

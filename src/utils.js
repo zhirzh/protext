@@ -34,16 +34,38 @@ function getDefaultCharsets(): { source: Charset, target: Charset } {
   };
 }
 
-function getStyleTag(targetFontFilename: string, fontFamily: string): string {
+function generateFontfaces(name: string, count: number): string {
+  const fontfaces = [];
+
+  for (let i = 0; i < count; i += 1) {
+    fontfaces.push(`
+      @font-face {
+        src: url("protext/${name}_${i}.ttf");
+        font-family: "protext_${i}";
+      }
+    `);
+  }
+
+  return fontfaces.join('');
+}
+
+function generateFontfamilies(count: number): string {
+  const fontfamilies = [];
+
+  for (let i = 0; i < count; i += 1) {
+    fontfamilies.push(`"protext_${i}"`);
+  }
+
+  return fontfamilies.join(', ');
+}
+
+function getStyleTag(targetFontFilename: string, fontFamily: string, targetFontFileCount: number): string {
   return (`
     <style>
-      @font-face {
-        font-family: "protext";
-        src: url("protext/${targetFontFilename}");
-      }
+      ${generateFontfaces(targetFontFilename, targetFontFileCount)}
 
       .protext {
-        font-family: "protext", "${fontFamily}";
+        font-family: ${generateFontfamilies(targetFontFileCount)}, "${fontFamily}";
       }
     </style>
   `);

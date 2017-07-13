@@ -16,14 +16,14 @@ class Protext {
   destination: string;
   fontFamily: string;
   mapper: Mapper;
-
+  targetFontFileCount: number;
   targetFontFilename: string;
 
   sourceFont: Font;
-  targetFont: Font;
+  targetFonts: Array<Font>;
 
   sourceCharset: Charset;
-  targetCharset:Charset;
+  targetCharset: Charset;
 
   constructor(options: Options) {
     const err = validateOptions(options);
@@ -36,7 +36,7 @@ class Protext {
     utils.cleanDestination(this.destination);
 
     this.mapper = this.generateMapper();
-    this.targetFont = this.generateTargetFont();
+    this.targetFonts = this.generateTargetFont();
     this.targetFontFilename = this.writeTargetFont();
 
     return {
@@ -65,7 +65,7 @@ class Protext {
 
     const encodedHtml = html.replace(
       protextStyleRegexp,
-      utils.getStyleTag(this.targetFontFilename, this.fontFamily),
+      utils.getStyleTag(this.targetFontFilename, this.fontFamily, this.targetFontFileCount),
     );
 
     return encodedHtml;
@@ -98,7 +98,7 @@ class Protext {
     inStream
       .pipe(replaceStream(
         protextStyleRegexp,
-        utils.getStyleTag(this.targetFontFilename, this.fontFamily),
+        utils.getStyleTag(this.targetFontFilename, this.fontFamily, this.targetFontFileCount),
       ))
       .pipe(replaceStream(
         sourceTextRegexp,
@@ -129,8 +129,18 @@ class Protext {
     return mapper;
   }
 
-  generateTargetFont(): Font {
-    const glyphs = [this.sourceFont.glyphs.get(0)];
+  generateTargetFont(): Array<Font> {
+    const notdefGlyph = new opentype.Glyph({
+        name: '.notdef',
+        unicode: 0,
+        advanceWidth: 650,
+        path: new opentype.Path()
+    });
+
+    const glyphsets = [];
+    for (let i = 0; i < this.targetFontFileCount; i += 1) {
+      glyphsets.push([notdefGlyph]);
+    }
 
     Array.from(this.mapper.entries()).forEach(([sourceChar, targetChar]) => {
       const sourceGlyph = this.sourceFont.charToGlyph(sourceChar);
@@ -140,40 +150,50 @@ class Protext {
 
       targetGlyph.path = sourceGlyph.path;
       targetGlyph.advanceWidth = sourceGlyph.advanceWidth;
-      glyphs.push(targetGlyph);
+
+      const randomIdx = Math.floor(Math.random() * glyphsets.length);
+      const glyphset = glyphsets[randomIdx];
+      glyphset.push(targetGlyph);
     });
 
-    const targetFont = new opentype.Font({
-      familyName: this.sourceFont.names.fontFamily.en,
-      styleName: this.sourceFont.names.fontSubfamily.en,
+    const targetFonts = glyphsets.map(glyphs => new opentype.Font({
+      familyName: this.sourceFont.familyName,
+      styleName: this.sourceFont.styleName,
 
       unitsPerEm: this.sourceFont.unitsPerEm,
       ascender: this.sourceFont.ascender,
       descender: this.sourceFont.descender,
 
       glyphs,
-    });
+    }));
 
-    return targetFont;
+    return targetFonts;
   }
 
   unpackOptions(options: Options) {
     this.destination = options.destination;
 
-    this.sourceFont = opentype.loadSync(options.font);
-
     const charsets = options.charsets || utils.getDefaultCharsets();
     this.sourceCharset = charsets.source;
     this.targetCharset = charsets.target;
 
-    this.fontFamily = options.fontFamily || this.sourceFont.names.fontFamily.en;
+    this.sourceFont = opentype.loadSync(options.font);
+    this.sourceFont.familyName = this.sourceFont.names.fontFamily.en || utils.randomString();
+    this.sourceFont.styleName = this.sourceFont.names.fontSubfamily.en || utils.randomString();
+
+
+    this.fontFamily = options.fontFamily || this.sourceFont.names.fontFamily.en || utils.randomString();
+
+    this.targetFontFileCount = options.count || 1;
   }
 
   writeTargetFont(): string {
-    const targetFontFilename = `${utils.randomString()}.ttf`;
+    const targetFontFilename = utils.randomString();
     const protextDirpath = path.resolve(this.destination, 'protext');
 
-    this.targetFont.download(path.resolve(protextDirpath, targetFontFilename));
+    this.targetFonts.forEach((targetFont, idx) => {
+      targetFont.download(path.resolve(protextDirpath, `${targetFontFilename}_${idx}.ttf`));
+    });
 
     return targetFontFilename;
   }

@@ -48,6 +48,20 @@ function validateOptions(options: Options): Error | null {
           return null;
       }
 
+    // options.count: optional
+    case 'count' in options:
+      switch (true) {
+        case options.count === undefined:
+        case options.count === null:
+          return errors['count-not-defined'];
+
+        case options.count.constructor !== Number:
+          return errors['count-not-object'];
+
+        default:
+          return null;
+      }
+
     // options.destination: required
     case options.destination === undefined:
     case options.destination === null:
