@@ -1,0 +1,32 @@
+<style>
+  @font-face {
+    src: url("../Lobster-Regular.ttf");
+    font-family: "Lobster";
+  }
+  
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  p {
+    font-size: 3rem;
+    letter-spacing: 6px;
+    font-family: "Lobster";
+  }
+</style>
+
+{{protext}}
+
+<p>
+  <!--The quick brown fox jumps over the lazy dog-->
+  qwertyuiopasdfghjklzxcvbnm
+</p>
+
+<p>
+  {{#protext}}
+    <!--The quick brown fox jumps over the lazy dog-->
+    qwertyuiopasdfghjklzxcvbnm
+  {{/protext}}
+</p>
