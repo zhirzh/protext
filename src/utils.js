@@ -1,8 +1,12 @@
+// @flow
+
 import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
 
-function cleanDestination(destination) {
+import type { Charset } from './types';
+
+function cleanDestination(destination: string) {
   if (!fs.existsSync(destination)) {
     fs.mkdir(destination);
   }
@@ -17,7 +21,7 @@ function cleanDestination(destination) {
     .forEach(filename => fs.unlinkSync(path.resolve(protextDirpath, filename)));
 }
 
-function getDefaultCharsets() {
+function getDefaultCharsets(): { source: Charset, target: Charset } {
   const numbers = '1234567890';
   const alphabetsLowercase = 'abcdefghijklmnopqrstuvwxyz';
   const alphabetsUppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -30,7 +34,7 @@ function getDefaultCharsets() {
   };
 }
 
-function randomString() {
+function randomString(): string {
   return crypto.randomBytes(16).toString('hex');
 }
 

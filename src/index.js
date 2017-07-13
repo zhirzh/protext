@@ -1,14 +1,30 @@
+// @flow
+
 import fs from 'fs';
 import path from 'path';
 
 import utils from './utils';
 import validateOptions from './validate-options';
 
+import type { Charset, Font, Mapper, Options } from './types';
+
 // import opentype from 'opentype.js';
 const opentype = require('opentype.js');
 
 class Protext {
-  constructor(options) {
+  destination: string;
+  fontFamily: string;
+  mapper: Mapper;
+
+  targetFontFilename: string;
+
+  sourceFont: Font;
+  targetFont: Font;
+
+  sourceCharset: Charset;
+  targetCharset:Charset;
+
+  constructor(options: Options) {
     const err = validateOptions(options);
     if (err !== null) {
       throw err;
@@ -28,7 +44,7 @@ class Protext {
     };
   }
 
-  encodeBody(html) {
+  encodeBody(html: string): string {
     const sourceTextRegexp = new RegExp(
       '{{#protext}}([\\s\\S]*?){{/protext}}',
       'g',
@@ -42,7 +58,7 @@ class Protext {
     return encodedHtml;
   }
 
-  encodeHead(html) {
+  encodeHead(html: string): string {
     const protextStyleRegexp = new RegExp('{{protext}}', 'g');
 
     const encodedHtml = html.replace(
@@ -62,7 +78,7 @@ class Protext {
     return encodedHtml;
   }
 
-  encodeHtml(filepath) {
+  encodeHtml(filepath: string) {
     const filename = path.basename(filepath).replace(/(.tmpl)?$/, '');
 
     let html = fs.readFileSync(filepath, 'utf8');
@@ -73,7 +89,7 @@ class Protext {
     fs.writeFileSync(path.resolve(this.destination, filename), html);
   }
 
-  encodeText(sourceText) {
+  encodeText(sourceText: string): string {
     const targetText = sourceText
       .split('')
       .map(sourceChar => this.mapper.get(sourceChar) || sourceChar)
@@ -82,7 +98,7 @@ class Protext {
     return targetText;
   }
 
-  generateMapper() {
+  generateMapper(): Mapper {
     const mapper = new Map();
 
     this.sourceCharset.forEach(sourceChar => {
@@ -95,7 +111,7 @@ class Protext {
     return mapper;
   }
 
-  generateTargetFont() {
+  generateTargetFont(): Font {
     const glyphs = [this.sourceFont.glyphs.get(0)];
 
     Array.from(this.mapper.entries()).forEach(([sourceChar, targetChar]) => {
@@ -123,7 +139,7 @@ class Protext {
     return targetFont;
   }
 
-  unpackOptions(options) {
+  unpackOptions(options: Options) {
     this.destination = options.destination;
 
     this.sourceFont = opentype.loadSync(options.font);
@@ -135,7 +151,7 @@ class Protext {
     this.fontFamily = options.fontFamily || this.sourceFont.names.fontFamily.en;
   }
 
-  writeTargetFont() {
+  writeTargetFont(): string {
     const targetFontFilename = `${utils.randomString()}.ttf`;
     const protextDirpath = path.resolve(this.destination, 'protext');
 

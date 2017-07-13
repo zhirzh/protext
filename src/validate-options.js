@@ -1,6 +1,10 @@
+// @flow
+
 import errors from './errors';
 
-function validateOptions(options) {
+import type { Options } from './types';
+
+function validateOptions(options: Options): Error | null {
   switch (true) {
     // options: required
     case options === undefined:
