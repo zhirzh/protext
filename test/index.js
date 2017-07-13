@@ -7,8 +7,12 @@ const encoder = new Protext({
     font: path.resolve(__dirname, 'Lobster-Regular.ttf'),
 });
 
-console.log(
-    encoder.encodeHtml(
-        path.resolve(__dirname, 'test.html.tmpl')
-    )
+console.log(encoder.encodeText('hello world - 123 !!'));
+
+encoder.encodeHtmlFile(
+    path.resolve(__dirname, 'test.html.tmpl')
+);
+
+encoder.encodeHtmlStream(
+    path.resolve(__dirname, 'test.html.tmpl')
 );
