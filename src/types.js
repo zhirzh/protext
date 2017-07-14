@@ -17,9 +17,4 @@ type Mapper = Map<string, string>;
 
 type Font = Object;
 
-export type {
-  Charset,
-  Font,
-  Mapper,
-  Options,
-};
+export type { Charset, Font, Mapper, Options };

@@ -35,32 +35,39 @@ function getDefaultCharsets(): { source: Charset, target: Charset } {
 }
 
 function generateFontfaces(names: Array<string>): string {
-  const fontfaces = names.map(name => (`
+  const fontfaces = names.map(
+    name => `
       @font-face {
       src: url("protext/${name}.ttf");
       font-family: "protext_${name}";
     }
-  `))
+  `,
+  );
 
   return fontfaces.join('');
 }
 
 function generateFontfamilies(names: Array<string>): string {
-  const fontfamilies = names.map(name => (`"protext_${name}"`));
+  const fontfamilies = names.map(name => `"protext_${name}"`);
 
   return fontfamilies.join(', ');
 }
 
-function getStyleTag(targetFontFilenames: Array<string>, fontFamily: string): string {
-  return (`
+function getStyleTag(
+  targetFontFilenames: Array<string>,
+  fontFamily: string,
+): string {
+  return `
     <style>
       ${generateFontfaces(targetFontFilenames)}
 
       .protext {
-        font-family: ${generateFontfamilies(targetFontFilenames)}, "${fontFamily}";
+        font-family: ${generateFontfamilies(
+          targetFontFilenames,
+        )}, "${fontFamily}";
       }
     </style>
-  `);
+  `;
 }
 
 function randomString(): string {

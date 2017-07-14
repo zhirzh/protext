@@ -91,19 +91,24 @@ class Protext {
       'g',
     );
 
-
     const inStream = fs.createReadStream(filepath);
-    const outStream = fs.createWriteStream(path.resolve(this.destination, filename));
+    const outStream = fs.createWriteStream(
+      path.resolve(this.destination, filename),
+    );
 
     inStream
-      .pipe(replaceStream(
-        protextStyleRegexp,
-        utils.getStyleTag(this.targetFontFilenames, this.fontFamily),
-      ))
-      .pipe(replaceStream(
-        sourceTextRegexp,
-        (_, p1) => `<span class="protext">${this.encodeText(p1)}</span>`,
-      ))
+      .pipe(
+        replaceStream(
+          protextStyleRegexp,
+          utils.getStyleTag(this.targetFontFilenames, this.fontFamily),
+        ),
+      )
+      .pipe(
+        replaceStream(
+          sourceTextRegexp,
+          (_, p1) => `<span class="protext">${this.encodeText(p1)}</span>`,
+        ),
+      )
       .pipe(outStream);
   }
 
@@ -131,10 +136,10 @@ class Protext {
 
   generateTargetFonts(): Array<Font> {
     const notdefGlyph = new opentype.Glyph({
-        name: '.notdef',
-        unicode: 0,
-        advanceWidth: 650,
-        path: new opentype.Path()
+      name: '.notdef',
+      unicode: 0,
+      advanceWidth: 650,
+      path: new opentype.Path(),
     });
 
     const glyphsets = [];
@@ -184,11 +189,15 @@ class Protext {
     this.targetCharset = charsets.target;
 
     this.sourceFont = opentype.loadSync(options.font);
-    this.sourceFont.familyName = this.sourceFont.names.fontFamily.en || utils.randomString();
-    this.sourceFont.styleName = this.sourceFont.names.fontSubfamily.en || utils.randomString();
+    this.sourceFont.familyName =
+      this.sourceFont.names.fontFamily.en || utils.randomString();
+    this.sourceFont.styleName =
+      this.sourceFont.names.fontSubfamily.en || utils.randomString();
 
-
-    this.fontFamily = options.fontFamily || this.sourceFont.names.fontFamily.en || utils.randomString();
+    this.fontFamily =
+      options.fontFamily ||
+      this.sourceFont.names.fontFamily.en ||
+      utils.randomString();
 
     this.targetFontFileCount = options.count || 1;
   }
@@ -196,12 +205,17 @@ class Protext {
   writeTargetFont(): Array<string> {
     const protextDirpath = path.resolve(this.destination, 'protext');
 
-    this.targetFonts.forEach((targetFont) => {
-      const targetFontFilepath = path.resolve(protextDirpath, `${targetFont.filename}.ttf`);
+    this.targetFonts.forEach(targetFont => {
+      const targetFontFilepath = path.resolve(
+        protextDirpath,
+        `${targetFont.filename}.ttf`,
+      );
       targetFont.download(targetFontFilepath);
     });
 
-    const targetFontFilenames = this.targetFonts.map(targetFont => targetFont.filename)
+    const targetFontFilenames = this.targetFonts.map(
+      targetFont => targetFont.filename,
+    );
     return targetFontFilenames;
   }
 }
