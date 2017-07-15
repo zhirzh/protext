@@ -87,22 +87,24 @@ class Protext {
       glyphset.push(targetGlyph);
     });
 
-    const targetFonts = glyphsets.map(glyphs => {
-      const targetFont = new opentype.Font({
-        familyName: this.sourceFont.familyName,
-        styleName: this.sourceFont.styleName,
+    const targetFonts = glyphsets
+      .filter(glyphset => glyphset.length > 1)
+      .map(glyphset => {
+        const targetFont = new opentype.Font({
+          familyName: this.sourceFont.familyName,
+          styleName: this.sourceFont.styleName,
 
-        unitsPerEm: this.sourceFont.unitsPerEm,
-        ascender: this.sourceFont.ascender,
-        descender: this.sourceFont.descender,
+          unitsPerEm: this.sourceFont.unitsPerEm,
+          ascender: this.sourceFont.ascender,
+          descender: this.sourceFont.descender,
 
-        glyphs,
+          glyphs: glyphset,
+        });
+
+        targetFont.filename = utils.randomString();
+
+        return targetFont;
       });
-
-      targetFont.filename = utils.randomString();
-
-      return targetFont;
-    });
 
     return targetFonts;
   }
