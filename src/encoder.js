@@ -1,6 +1,7 @@
 // @flow
 
 import fs from 'fs';
+import path from 'path';
 
 import utils from './utils';
 
@@ -47,8 +48,9 @@ class Encoder {
     return encodedHtml;
   }
 
-  encodeHead(html: string): string {
+  encodeHead(html: string, relativePath: string): string {
     const styleTag = utils.getStyleTag(
+      relativePath,
       this.targetFontFilenames,
       this.fontFamily,
     );
@@ -61,7 +63,9 @@ class Encoder {
   encodeHtmlFile = (entry: string, output: string) => {
     let html = fs.readFileSync(entry, 'utf8');
 
-    html = this.encodeHead(html);
+    const relativePath = path.relative(path.dirname(output), this.destination);
+
+    html = this.encodeHead(html, relativePath.length > 0 ? relativePath : '.');
     html = this.encodeBody(html);
 
     fs.writeFileSync(output, html);

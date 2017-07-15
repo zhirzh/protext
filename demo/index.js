@@ -1,6 +1,6 @@
 const path = require('path');
 
-const Protext = require('/home/zhirzh/protext/build/protext').default;
+const Protext = require('../build/protext').default;
 
 const SRC_DIR = path.resolve(__dirname, 'src');
 const BUILD_DIR = path.resolve(__dirname, 'build');

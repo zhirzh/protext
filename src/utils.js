@@ -34,11 +34,11 @@ function getDefaultCharsets(): { source: Charset, target: Charset } {
   };
 }
 
-function generateFontfaces(names: Array<string>): string {
+function generateFontfaces(relativePath: string, names: Array<string>): string {
   const fontfaces = names.map(
     name => `
       @font-face {
-      src: url("protext/${name}.ttf");
+      src: url("${relativePath}/protext/${name}.ttf");
       font-family: "protext_${name}";
     }
   `,
@@ -54,12 +54,15 @@ function generateFontfamilies(names: Array<string>): string {
 }
 
 function getStyleTag(
+  relativePath: string,
   targetFontFilenames: Array<string>,
   fontFamily: string,
 ): string {
+  console.log(relativePath);
+
   return `
     <style>
-      ${generateFontfaces(targetFontFilenames)}
+      ${generateFontfaces(relativePath, targetFontFilenames)}
 
       .protext {
         font-family: ${generateFontfamilies(
