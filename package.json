@@ -2,6 +2,7 @@
   "name": "protext",
   "version": "1.0.0",
   "author": "Shirsh Zibbu <zibbu.shirsh+github@gmail.com>",
+  "main": "build/protext.js",
   "engines": {
     "node": "8.x",
     "npm": "5.x"
