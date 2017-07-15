@@ -53,13 +53,11 @@ function generateFontfamilies(names: Array<string>): string {
   return fontfamilies.join(', ');
 }
 
-function getStyleTag(
+function generateStyleTag(
   relativePath: string,
   targetFontFilenames: Array<string>,
   fontFamily: string,
 ): string {
-  console.log(relativePath);
-
   return `
     <style>
       ${generateFontfaces(relativePath, targetFontFilenames)}
@@ -80,6 +78,6 @@ function randomString(): string {
 export default {
   cleanDestination,
   getDefaultCharsets,
-  getStyleTag,
+  generateStyleTag,
   randomString,
 };

@@ -39,34 +39,25 @@ class Encoder {
     this.targetFontFilenames = options.targetFontFilenames;
   }
 
-  encodeBody(html: string): string {
-    const encodedHtml = html.replace(
-      this.sourceTextRegexp,
-      this.sourceTextReplacer,
-    );
-
-    return encodedHtml;
-  }
-
-  encodeHead(html: string, relativePath: string): string {
-    const styleTag = utils.getStyleTag(
-      relativePath,
+  generateStyleTag(output: string) {
+    const relativePath = path.relative(path.dirname(output), this.destination);
+    const styleTag = utils.generateStyleTag(
+      relativePath || '.',
       this.targetFontFilenames,
       this.fontFamily,
     );
 
-    const encodedHtml = html.replace(this.protextStyleRegexp, styleTag);
-
-    return encodedHtml;
+    return styleTag;
   }
 
   encodeHtmlFile = (entry: string, output: string) => {
     let html = fs.readFileSync(entry, 'utf8');
 
-    const relativePath = path.relative(path.dirname(output), this.destination);
+    const styleTag = this.generateStyleTag(output);
 
-    html = this.encodeHead(html, relativePath.length > 0 ? relativePath : '.');
-    html = this.encodeBody(html);
+    html = html.replace(this.protextStyleRegexp, styleTag);
+
+    html = html.replace(this.sourceTextRegexp, this.sourceTextReplacer);
 
     fs.writeFileSync(output, html);
   };
@@ -75,10 +66,7 @@ class Encoder {
     const inStream = fs.createReadStream(entry);
     const outStream = fs.createWriteStream(output);
 
-    const styleTag = utils.getStyleTag(
-      this.targetFontFilenames,
-      this.fontFamily,
-    );
+    const styleTag = this.generateStyleTag(output);
 
     inStream
       .pipe(replaceStream(this.protextStyleRegexp, styleTag))
