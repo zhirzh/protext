@@ -51,6 +51,8 @@ class Encoder {
   }
 
   encodeHtmlFile = (entry: string, output: string) => {
+    output = output.replace(/\.tmpl$/g, ''); // eslint-disable-line no-param-reassign
+
     let html = fs.readFileSync(entry, 'utf8');
 
     const styleTag = this.generateStyleTag(output);
@@ -63,6 +65,12 @@ class Encoder {
   };
 
   encodeHtmlStream = (entry: string, output: string) => {
+    output = output.replace(/\.tmpl$/g, ''); // eslint-disable-line no-param-reassign
+
+    if (entry === output) {
+      throw new Error('`entry` and `output` paths MUST be different');
+    }
+
     const inStream = fs.createReadStream(entry);
     const outStream = fs.createWriteStream(output);
 
