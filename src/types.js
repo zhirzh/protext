@@ -2,7 +2,7 @@
 
 type Charset = Array<string>;
 
-type Options = {
+type ProtextOptions = {
   charsets: {
     source: Charset,
     target: Charset,
@@ -15,6 +15,13 @@ type Options = {
 
 type Mapper = Map<string, string>;
 
+type EncoderOptions = {
+  destination: string,
+  fontFamily: string,
+  mapper: Mapper,
+  targetFontFilenames: Array<string>,
+};
+
 type Font = Object;
 
-export type { Charset, Font, Mapper, Options };
+export type { Charset, EncoderOptions, Font, Mapper, ProtextOptions };

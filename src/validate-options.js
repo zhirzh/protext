@@ -2,9 +2,9 @@
 
 import errors from './errors';
 
-import type { Options } from './types';
+import type { ProtextOptions } from './types';
 
-function validateOptions(options: Options): Error | null {
+function validateOptions(options: ProtextOptions): Error | null {
   switch (true) {
     // options: required
     case options === undefined:

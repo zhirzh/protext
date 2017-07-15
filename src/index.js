@@ -1,16 +1,16 @@
 // @flow
 
-import fs from 'fs';
 import path from 'path';
 
 import utils from './utils';
 import validateOptions from './validate-options';
 
-import type { Charset, Font, Mapper, Options } from './types';
+import type { Charset, Font, Mapper, ProtextOptions } from './types';
+
+import Encoder from './encoder';
 
 // import opentype from 'opentype.js';
 const opentype = require('opentype.js');
-const replaceStream = require('replacestream');
 
 class Protext {
   destination: string;
@@ -25,7 +25,7 @@ class Protext {
   sourceCharset: Charset;
   targetCharset: Charset;
 
-  constructor(options: Options) {
+  constructor(options: ProtextOptions) {
     const err = validateOptions(options);
     if (err !== null) {
       throw err;
@@ -39,86 +39,12 @@ class Protext {
     this.targetFonts = this.generateTargetFonts();
     this.targetFontFilenames = this.writeTargetFont();
 
-    return {
-      encodeText: this.encodeText.bind(this),
-      encodeHtmlFile: this.encodeHtmlFile.bind(this),
-      encodeHtmlStream: this.encodeHtmlStream.bind(this),
-    };
-  }
-
-  encodeBody(html: string): string {
-    const sourceTextRegexp = new RegExp(
-      '{{#protext}}([\\s\\S]*?){{/protext}}',
-      'g',
-    );
-
-    const encodedHtml = html.replace(
-      sourceTextRegexp,
-      (_, p1) => `<span class="protext">${this.encodeText(p1)}</span>`,
-    );
-
-    return encodedHtml;
-  }
-
-  encodeHead(html: string): string {
-    const protextStyleRegexp = new RegExp('{{protext}}', 'g');
-
-    const encodedHtml = html.replace(
-      protextStyleRegexp,
-      utils.getStyleTag(this.targetFontFilenames, this.fontFamily),
-    );
-
-    return encodedHtml;
-  }
-
-  encodeHtmlFile(filepath: string) {
-    const filename = path.basename(filepath).replace(/(.tmpl)?$/, '');
-
-    let html = fs.readFileSync(filepath, 'utf8');
-
-    html = this.encodeHead(html);
-    html = this.encodeBody(html);
-
-    fs.writeFileSync(path.resolve(this.destination, filename), html);
-  }
-
-  encodeHtmlStream(filepath: string) {
-    const filename = path.basename(filepath).replace(/(.tmpl)?$/, '');
-
-    const protextStyleRegexp = new RegExp('{{protext}}', 'g');
-    const sourceTextRegexp = new RegExp(
-      '{{#protext}}([\\s\\S]*?){{/protext}}',
-      'g',
-    );
-
-    const inStream = fs.createReadStream(filepath);
-    const outStream = fs.createWriteStream(
-      path.resolve(this.destination, filename),
-    );
-
-    inStream
-      .pipe(
-        replaceStream(
-          protextStyleRegexp,
-          utils.getStyleTag(this.targetFontFilenames, this.fontFamily),
-        ),
-      )
-      .pipe(
-        replaceStream(
-          sourceTextRegexp,
-          (_, p1) => `<span class="protext">${this.encodeText(p1)}</span>`,
-        ),
-      )
-      .pipe(outStream);
-  }
-
-  encodeText(sourceText: string): string {
-    const targetText = sourceText
-      .split('')
-      .map(sourceChar => this.mapper.get(sourceChar) || sourceChar)
-      .join('');
-
-    return targetText;
+    return new Encoder({
+      destination: this.destination,
+      fontFamily: this.fontFamily,
+      mapper: this.mapper,
+      targetFontFilenames: this.targetFontFilenames,
+    });
   }
 
   generateMapper(): Mapper {
@@ -181,7 +107,7 @@ class Protext {
     return targetFonts;
   }
 
-  unpackOptions(options: Options) {
+  unpackOptions(options: ProtextOptions) {
     this.destination = options.destination;
 
     const charsets = options.charsets || utils.getDefaultCharsets();
