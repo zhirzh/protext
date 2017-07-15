@@ -12,6 +12,7 @@
   },
   "devDependencies": {
     "babel-core": "^6.25.0",
+    "babel-eslint": "^7.2.3",
     "babel-loader": "^7.1.1",
     "babel-polyfill": "^6.23.0",
     "babel-preset-env": "^1.6.0",
@@ -30,6 +31,7 @@
   },
   "eslintConfig": {
     "extends": "airbnb-base",
+    "parser": "babel-eslint",
     "rules": {
       "arrow-parens": [
         "error",
