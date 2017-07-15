@@ -1,0 +1,33 @@
+<style>
+  @font-face {
+    src: url("./fonts/font.ttf");
+    font-family: "foo";
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  p {
+    font-size: 3rem;
+    padding: 10px;
+    letter-spacing: 4px;
+    font-family: "foo";
+  }
+</style>
+
+{{protext}}
+
+<p>
+  <!--The quick brown fox jumps over the lazy dog-->
+  abcdefghijklmnopqrstuvwxyz
+</p>
+
+<p>
+  {{#protext}}
+    <!--The quick brown fox jumps over the lazy dog-->
+    abcdefghijklmnopqrstuvwxyz
+  {{/protext}}
+</p>

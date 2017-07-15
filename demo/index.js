@@ -1,23 +1,30 @@
 const path = require('path');
 
-const Protext = require('../build/protext').default;
+const Protext = require('/home/zhirzh/protext/build/protext').default;
+
+const SRC_DIR = path.resolve(__dirname, 'src');
+const BUILD_DIR = path.resolve(__dirname, 'build');
 
 const encoder = new Protext({
-  destination: 'build',
-  font: path.resolve(__dirname, 'font.ttf'),
+  destination: BUILD_DIR,
+  font: path.resolve(SRC_DIR, 'fonts', 'font.ttf'),
 
-  // count: 3,
+  count: 7,
 
-  // charsets: {
-  //   source: 'abcdefghij'.split(''),
-  //   target: '1234567890'.split(''),
-  // },
+  charsets: {
+    source: 'abcd'.split(''),
+    target: '1234'.split(''),
+  },
 
-  // fontFamily: 'foo',
+  fontFamily: 'foo',
 });
 
-console.log(encoder.encodeText('hello world - 123 !!'));
+encoder.encodeHtmlFile(
+  path.resolve(SRC_DIR, 'index.html.tmpl'),
+  path.resolve(BUILD_DIR, 'index.html'),
+);
 
-encoder.encodeHtmlFile(path.resolve(__dirname, 'test.html.tmpl'));
-
-encoder.encodeHtmlStream(path.resolve(__dirname, 'test.html.tmpl'));
+encoder.encodeHtmlFile(
+  path.resolve(SRC_DIR, 'page', 'page.html.tmpl'),
+  path.resolve(BUILD_DIR, 'page', 'page.html'),
+);
