@@ -8,7 +8,7 @@ import type { Charset } from './types';
 
 function cleanDestination(destination: string) {
   if (!fs.existsSync(destination)) {
-    fs.mkdir(destination);
+    fs.mkdirSync(destination);
   }
 
   const protextDirpath = path.resolve(destination, 'protext');
