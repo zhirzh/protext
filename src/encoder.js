@@ -9,6 +9,9 @@ import type { EncoderOptions, Mapper } from './types';
 
 const replaceStream = require('replacestream');
 
+/**
+ * Encoder class
+ */
 class Encoder {
   destination: string;
   fontFamily: string;
@@ -22,15 +25,11 @@ class Encoder {
     this.unpackOptions(options);
 
     this.protextStyleRegexp = new RegExp('{{protext}}', 'g');
-    this.sourceTextRegexp = new RegExp(
-      '{{#protext}}([\\s\\S]*?){{/protext}}',
-      'g',
-    );
+    this.sourceTextRegexp = new RegExp('{{#protext}}([\\s\\S]*?){{/protext}}', 'g');
   }
 
-  sourceTextReplacer = (_: any, p1: string) => {
-    return `<span class="protext">${this.encodeText(p1)}</span>`;
-  };
+  sourceTextReplacer = (_: any, p1: string) =>
+    `<span class="protext">${this.encodeText(p1)}</span>`;
 
   unpackOptions(options: EncoderOptions) {
     this.destination = options.destination;

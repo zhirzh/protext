@@ -4,6 +4,9 @@ import errors from './errors';
 
 import type { ProtextOptions } from './types';
 
+/**
+ * Validate passed options. Throw error if incorrect options provided.
+ */
 function validateOptions(options: ProtextOptions): Error | null {
   switch (true) {
     // options: required
